@@ -56,7 +56,7 @@ To set up the Plant Disease Detection backend locally, follow the instructions b
    cd Plant-DiseaseDetection-Backend
    ```
 
-3. Create a `.env` file in the root directory of the project and add the following line:
+3. Create a `.env` file in PlantPrediction directory of the project and add the following line:
 
    ```plaintext
    API_KEY=your_api_key
