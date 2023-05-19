@@ -11,16 +11,21 @@ import io
 from dotenv import load_dotenv
 import os
 import openai
+import ast
 
 class PlantPredictionView(views.APIView):
     def post(self, request):
+
+        def string_to_array(string):
+            array = ast.literal_eval(string)
+            return array
         
         def getSuggestions(prediction):
             load_dotenv()
             API_KEY = os.environ.get("API_KEY")
             openai.api_key =API_KEY
             
-            content_variable = f"give me some generale suggestion for treating apple scab {prediction}"
+            content_variable = f"give me some generale suggestion for treating apple scab {prediction}.the response should be in this format: ['suggestion1','suggestion2' ...].The response should be in one line "
 
             completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -84,8 +89,9 @@ class PlantPredictionView(views.APIView):
         # Use the model to predict the class of the image
         prediction = model.predict(img_array)
         suggestions=getSuggestions(prediction)
-
+        suggestions=string_to_array(suggestions)
 
         data= [{"prediction": result[np.argmax(prediction)],'suggestions':suggestions}]
+        print(data)
         results = PlantPredictionSerializer(data, many=True).data
         return Response(results)
