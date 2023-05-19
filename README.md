@@ -21,7 +21,7 @@ POST /plant_prediction HTTP/1.1
 Content-Type: application/json
 
 {
-  "image_link": "https://example.com/image.jpg"
+  "img_link": "https://example.com/image.jpg"
 }
 ```
 
@@ -59,10 +59,10 @@ To set up the Plant Disease Detection backend locally, follow the instructions b
 3. Create a `.env` file in the root directory of the project and add the following line:
 
    ```plaintext
-   GPT3_API_KEY=your_gpt3_api_key
+   API_KEY=your_api_key
    ```
 
-   Replace `your_gpt3_api_key` with your actual GPT-3 API key.
+   Replace `your_api_key` with your actual GPT-3 API key.
 
 4. Start the Django development server:
 
