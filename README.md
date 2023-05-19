@@ -16,21 +16,15 @@ This endpoint accepts a POST request and returns a JSON response containing the 
 
 **Example Request:**
 
-```http
-POST /plant_prediction HTTP/1.1
-Content-Type: application/json
-
+```json
 {
-  "img_link": "https://example.com/image.jpg"
+  "img_url": "image/url"
 }
 ```
 
 **Example Response:**
 
 ```json
-HTTP/1.1 200 OK
-Content-Type: application/json
-
 {
   "prediction": "Tomato Leaf Mold",
   "suggestions": [
