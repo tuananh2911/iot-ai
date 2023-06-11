@@ -70,6 +70,6 @@ To set up the Plant Disease Detection backend locally, follow the instructions b
 
 The CNN deep learning model used for plant disease detection was trained using Google Colab. The training notebook can be found at the following link:
 
-[Google Colab Training Notebook](https://colab.research.google.com/drive/166xQ-6AybNGNeDIcF3mbh2LI0Y3iFeAc)
+[Google Colab Training Notebook](https://colab.research.google.com/drive/166xQ-6AybNGNeDIcF3mbh2LI0Y3iFeAc?usp=sharing)
 
 Please refer to the notebook for the detailed training process and steps.
