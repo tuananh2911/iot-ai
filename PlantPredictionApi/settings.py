@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'PlantPrediction.apps.PlantpredictionConfig',
-    'rest_framework',
+    'ai',
+    'control'
 ]
 
 MIDDLEWARE = [
