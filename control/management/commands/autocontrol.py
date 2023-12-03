@@ -113,36 +113,38 @@ class AutoView():
 
     # Callback khi nhận được tin nhắn từ server
     def on_message(self, client, userdata, msg):
-        print(f"Message received: {msg.topic} {str(msg.payload)}")
-        if msg.topic == "topic/data":
-            client.publish("topic/mode", json.dumps({"check": 2}))
-        # Kiểm tra topic
-        if msg.topic == "topic/res_mode":
+        try:
+            print(f"Message received: {msg.topic} {str(msg.payload)}")
+            if msg.topic == "topic/data":
+                client.publish("topic/mode", json.dumps({"check": 2}))
+            # Kiểm tra topic
+            if msg.topic == "topic/res_mode":
+                data = json.loads(msg.payload)
+                print(data)
+                is_manual_control = data.get("isManualControl") == "true"
+                if is_manual_control:
+                    return  # Không thực hiện gì nếu là chế độ điều khiển thủ công
+            if msg.topic == "topic/res_mode":
+                return
+            # Tiếp tục xử lý cho các topic khác
             data = json.loads(msg.payload)
-            print(data)
-            is_manual_control = data.get("isManualControl") == "true"
-            if is_manual_control:
-                return  # Không thực hiện gì nếu là chế độ điều khiển thủ công
-        if msg.topic == "topic/res_mode":
-            return
-        # Tiếp tục xử lý cho các topic khác
-        data = json.loads(msg.payload)
-        temp_in = data['temperature']
-        temp_out = data['temperatureOut']
-        humd = data['humidity']
-        fan_speed = self.adjust_fan_speed(temp_out, temp_in)
-        pump_speed = self.adjust_pump_speed(temp_in, humd)
-        lux = data['lux']
-        is_light = lux < 50
+            temp_in = data['temperature']
+            temp_out = data['temperatureOut']
+            humd = data['humidity']
+            fan_speed = self.adjust_fan_speed(temp_out, temp_in)
+            pump_speed = self.adjust_pump_speed(temp_in, humd)
+            lux = data['lux']
+            is_light = lux < 50
 
-        publish_data = json.dumps({
-            "fanSpeed": round(fan_speed),
-            "pumpSpeed": round(pump_speed),
-            "isLight": is_light
-        })
+            publish_data = json.dumps({
+                "fanSpeed": round(fan_speed),
+                "pumpSpeed": round(pump_speed),
+                "isLight": is_light
+            })
 
-        client.publish("topic/control", publish_data)
-
+            client.publish("topic/control", publish_data)
+        except Exception as e:
+            print(f"Error : {e}")
 
 view = AutoView()
 view.client.connect("103.77.246.226", 1883, 60)
