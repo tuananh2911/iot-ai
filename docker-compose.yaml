@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  saveandpredict:
+    build: .
+    command: python manage.py saveandpredict
+    volumes:
+      - .:/app
+
+  autocontrol:
+    build: .
+    command: python manage.py autocontrol
+    volumes:
+      - .:/app

@@ -1,0 +1,10 @@
+json
+pickle
+pandas
+psycopg2
+paho-mqtt
+smtplib
+email
+skfuzzy
+numpy
+djangorestframework
