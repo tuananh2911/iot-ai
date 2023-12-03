@@ -19,7 +19,7 @@ psycopg2==2.9.9
 scikit-fuzzy==0.4.2
 scikit-image==0.19.3
 scikit-learn==1.2.1
-skfuzzy
+scikit-fuzzy
 numpy
 wcwidth==0.2.5
 weathercom==1.0.5
