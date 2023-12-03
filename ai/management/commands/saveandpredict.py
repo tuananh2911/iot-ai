@@ -81,10 +81,10 @@ class AutoView():
                     data_process = self.query(conn)
                     prediction_data = userdata.prepare_data_for_prediction(data_process)
                     rain_prediction = userdata.predict_rain(prediction_data)
-                    # if rain_prediction:
-                    #     emails = self.get_user_emails()
-                    #     for email in emails:
-                    #         userdata.send_email(email,"Rain Alert", "Rain is predicted in the next day.")
+                    if rain_prediction:
+                        emails = self.get_user_emails()
+                        for email in emails:
+                            userdata.send_email(email,"Rain Alert", "Rain is predicted in the next day.")
                 conn.commit()
 
                 # Đóng kết nối
