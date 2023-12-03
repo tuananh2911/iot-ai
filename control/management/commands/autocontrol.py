@@ -4,6 +4,8 @@ import skfuzzy as fuzz
 import paho.mqtt.client as mqtt
 from skfuzzy import control as ctrl
 import numpy as np
+
+
 class AutoView():
     def __init__(self):
         self.client = mqtt.Client()
@@ -64,20 +66,20 @@ class AutoView():
         pump_speed = ctrl.Consequent(np.arange(0, 101, 1), 'pump_speed')
 
         # Define fuzzy sets for temperature (similar to your existing code)
-        temp['cold'] = fuzz.trimf(temp.universe, [-10, 0, 10])
-        temp['comfortable'] = fuzz.trimf(temp.universe, [18, 24, 30])
+        temp['cold'] = fuzz.trimf(temp.universe, [-10, 0, 20])
+        temp['comfortable'] = fuzz.trimf(temp.universe, [20, 24, 32])
         temp['hot'] = fuzz.trimf(temp.universe, [30, 40, 50])
         # Define fuzzy sets for humidity
         humidity['low'] = fuzz.trimf(humidity.universe, [0, 0, 50])
         humidity['medium'] = fuzz.trimf(humidity.universe, [30, 50, 70])
-        humidity['high'] = fuzz.trimf(humidity.universe, [50, 100, 100])
+        humidity['high'] = fuzz.trimf(humidity.universe, [50, 75, 100])
 
         # Define fuzzy sets for pump speed (similar to your existing code)
-        pump_speed['off'] = fuzz.trimf(pump_speed.universe, [0, 0, 10])
-        pump_speed['low'] = fuzz.trimf(pump_speed.universe, [0, 25, 50])
-        pump_speed['medium'] = fuzz.trimf(pump_speed.universe, [25, 50, 75])
-        pump_speed['high'] = fuzz.trimf(pump_speed.universe, [50, 75, 100])
-        pump_speed['very_high'] = fuzz.trimf(pump_speed.universe, [75, 100, 100])
+        pump_speed['off'] = fuzz.trimf(pump_speed.universe, [0, 0, 75])
+        pump_speed['low'] = fuzz.trimf(pump_speed.universe, [50, 75, 100])
+        pump_speed['medium'] = fuzz.trimf(pump_speed.universe, [75, 125, 150])
+        pump_speed['high'] = fuzz.trimf(pump_speed.universe, [125, 150, 175])
+        pump_speed['very_high'] = fuzz.trimf(pump_speed.universe, [175, 200, 250])
         # Define rules considering both temperature and humidity
         # Example rules (you should define these based on your specific requirements)
         rule0 = ctrl.Rule(temp['cold'] | humidity['low'], pump_speed['off'])
@@ -107,19 +109,22 @@ class AutoView():
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code " + str(rc))
         client.subscribe("topic/data")
-        client.subscribe("topic/mode")
+        client.subscribe("topic/res_mode")
 
     # Callback khi nhận được tin nhắn từ server
     def on_message(self, client, userdata, msg):
         print(f"Message received: {msg.topic} {str(msg.payload)}")
-
+        if msg.topic == "topic/data":
+            client.publish("topic/mode", json.dumps({"check": 2}))
         # Kiểm tra topic
-        if msg.topic == "topic/mode":
+        if msg.topic == "topic/res_mode":
             data = json.loads(msg.payload)
-            is_manual_control = data.get("isManualControl", False)
+            print(data)
+            is_manual_control = data.get("isManualControl") == "true"
             if is_manual_control:
                 return  # Không thực hiện gì nếu là chế độ điều khiển thủ công
-
+        if msg.topic == "topic/res_mode":
+            return
         # Tiếp tục xử lý cho các topic khác
         data = json.loads(msg.payload)
         temp_in = data['temperature']
@@ -128,7 +133,7 @@ class AutoView():
         fan_speed = self.adjust_fan_speed(temp_out, temp_in)
         pump_speed = self.adjust_pump_speed(temp_in, humd)
         lux = data['lux']
-        is_light = lux < 500
+        is_light = lux < 50
 
         publish_data = json.dumps({
             "fanSpeed": round(fan_speed),
