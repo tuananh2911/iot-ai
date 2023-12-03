@@ -3,11 +3,14 @@ import json
 import skfuzzy as fuzz
 import paho.mqtt.client as mqtt
 from skfuzzy import control as ctrl
-from rest_framework import views, status
 import numpy as np
+class AutoView():
+    def __init__(self):
+        self.client = mqtt.Client()
+        self.client.on_connect = self.on_connect
+        self.client.on_message = self.on_message
 
-class AutoView(views.APIView):
-    def adjust_fan_speed(outdoor_temp, indoor_temp):
+    def adjust_fan_speed(self, outdoor_temp, indoor_temp):
         # Extend the temperature range to -10 to 50 degrees Celsius
         outdoor = ctrl.Antecedent(np.arange(-10, 51, 1), 'outdoor_temperature')
         indoor = ctrl.Antecedent(np.arange(-10, 51, 1), 'indoor_temperature')
@@ -54,7 +57,7 @@ class AutoView(views.APIView):
 
         return fan.output['fan_speed']
 
-    def adjust_pump_speed(temperature, humid):
+    def adjust_pump_speed(self, temperature, humid):
         # Define input variables
         temp = ctrl.Antecedent(np.arange(-10, 51, 1), 'temperature')
         humidity = ctrl.Antecedent(np.arange(0, 101, 1), 'humidity')
@@ -100,12 +103,14 @@ class AutoView(views.APIView):
         pump.compute()
 
         return pump.output['pump_speed']
-    def on_connect(client, userdata, flags, rc):
+
+    def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code " + str(rc))
         client.subscribe("topic/data")
         client.subscribe("topic/mode")
+
     # Callback khi nhận được tin nhắn từ server
-    def on_message(client, userdata, msg):
+    def on_message(self, client, userdata, msg):
         print(f"Message received: {msg.topic} {str(msg.payload)}")
 
         # Kiểm tra topic
@@ -120,8 +125,8 @@ class AutoView(views.APIView):
         temp_in = data['temperature']
         temp_out = data['temperatureOut']
         humd = data['humidity']
-        fan_speed = client.adjust_fan_speed(temp_out, temp_in)
-        pump_speed = client.adjust_pump_speed(temp_in, humd)
+        fan_speed = self.adjust_fan_speed(temp_out, temp_in)
+        pump_speed = self.adjust_pump_speed(temp_in, humd)
         lux = data['lux']
         is_light = lux < 500
 
@@ -132,11 +137,8 @@ class AutoView(views.APIView):
         })
 
         client.publish("topic/control", publish_data)
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    # Kết nối đến MQTT Broker (thay thế 'mqtt_broker_address' bằng địa chỉ thực tế)
-    client.connect("103.77.246.226", 1883, 60)
 
-    # Bắt đầu vòng lặp để xử lý callbacks
-    client.loop_forever()
+
+view = AutoView()
+view.client.connect("103.77.246.226", 1883, 60)
+view.client.loop_forever()
