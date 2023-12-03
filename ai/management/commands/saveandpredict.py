@@ -90,7 +90,7 @@ class AutoView():
             return []
 
     def load_model(self):
-        with open("/root/iot-ai/sarimax_model.pkl", 'rb') as pkl:
+        with open('sarimax_model.pkl', 'rb') as pkl:
             self.model = pickle.load(pkl)
 
     def predict_rain(self, data):
