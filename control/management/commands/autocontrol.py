@@ -1,8 +1,7 @@
 import json
 
 import skfuzzy as fuzz
-from paho import mqtt
-from rest_framework.response import Response
+import paho.mqtt.client as mqtt
 from skfuzzy import control as ctrl
 from rest_framework import views, status
 import numpy as np
